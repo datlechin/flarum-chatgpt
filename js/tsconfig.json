@@ -11,6 +11,5 @@
     "paths": {
       "flarum/*": ["../vendor/flarum/core/js/dist-typings/*"]
     },
-    "jsx": "react"
   }
 }
