@@ -1,0 +1,62 @@
+{
+    "name": "datlechin/flarum-chatgpt",
+    "description": "Add ChatGPT OpenAI to your Flarum.",
+    "keywords": [
+        "flarum",
+        "chatgpt",
+        "openai"
+    ],
+    "type": "flarum-extension",
+    "license": "MIT",
+    "require": {
+        "flarum/core": "^1.7.0",
+        "openai-php/client": "^0.3.5"
+    },
+    "authors": [
+        {
+            "name": "Ngo Quoc Dat",
+            "email": "datlechin@gmail.com",
+            "role": "Developer",
+            "homepage": "https://ngoquocdat.dev"
+        }
+    ],
+    "homepage": "https://ngoquocdat.dev",
+    "support": {
+        "source": "https://github.com/datlechin/flarum-chatgpt",
+        "forum": "https://discuss.flarum.org/d/"
+    },
+    "autoload": {
+        "psr-4": {
+            "Datlechin\\FlarumChatGPT\\": "src/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "ChatGPT",
+            "category": "feature",
+            "icon": {
+                "image": "icon.svg"
+            }
+        },
+        "flarum-cli": {
+            "modules": {
+                "admin": true,
+                "forum": true,
+                "js": true,
+                "jsCommon": false,
+                "css": true,
+                "locale": true,
+                "gitConf": true,
+                "githubActions": false,
+                "prettier": true,
+                "typescript": true,
+                "bundlewatch": false,
+                "backendTesting": false,
+                "editorConfig": true,
+                "styleci": false
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
