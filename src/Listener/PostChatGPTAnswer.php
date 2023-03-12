@@ -10,6 +10,7 @@ use Flarum\Post\CommentPost;
 use Flarum\Post\Event\Saving;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\Exception\PermissionDeniedException;
+use Flarum\User\User;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class PostChatGPTAnswer
@@ -32,7 +33,7 @@ class PostChatGPTAnswer
     /**
      * @throws PermissionDeniedException
      */
-    public function handle(Started $event)
+    public function handle(Started $event): void
     {
         if (! $this->settings->get('datlechin-chatgpt.enable_on_discussion_started', true)) {
             return;
@@ -40,6 +41,12 @@ class PostChatGPTAnswer
 
         $discussion = $event->discussion;
         $actor = $event->actor;
+
+        if ($userId = $this->settings->get('datlechin-chatgpt.user_prompt')) {
+            $user = User::find($userId);
+        }
+
+        $userPromptId = $user->id ?? $actor->id;
 
         $actor->assertCan('useChatGPTAssistant', $discussion);
 
@@ -54,7 +61,7 @@ class PostChatGPTAnswer
         $post = CommentPost::reply(
             $discussion->id,
             $content,
-            $actor->id,
+            $userPromptId,
             null,
         );
 
