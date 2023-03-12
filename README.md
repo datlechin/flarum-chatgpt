@@ -12,6 +12,8 @@ The auto-answer feature uses the text-davinci-003 model to generate quick and ac
 
 ## Installation
 
+This extension requierd Flarum 1.7 and PHP ^8.1.
+
 Install with composer:
 
 ```sh
