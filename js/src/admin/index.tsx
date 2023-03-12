@@ -24,7 +24,7 @@ app.initializers.add('datlechin/flarum-chatgpt', () => {
       }),
     })
     .registerSetting({
-      setting: 'datlehin-chatgpt.max_tokens',
+      setting: 'datlechin-chatgpt.max_tokens',
       type: 'number',
       label: app.translator.trans('datlechin-chatgpt.admin.settings.max_tokens_label'),
       help: app.translator.trans('datlechin-chatgpt.admin.settings.max_tokens_help', {
