@@ -1,6 +1,6 @@
 {
     "name": "datlechin/flarum-chatgpt",
-    "description": "Add ChatGPT OpenAI to your Flarum.",
+    "description": "ChatGPT: AI-powered Auto-Reply Extension for Flarum.",
     "keywords": [
         "flarum",
         "chatgpt",
@@ -23,7 +23,7 @@
     "homepage": "https://ngoquocdat.dev",
     "support": {
         "source": "https://github.com/datlechin/flarum-chatgpt",
-        "forum": "https://discuss.flarum.org/d/"
+        "forum": "https://discuss.flarum.org/d/32535"
     },
     "autoload": {
         "psr-4": {
