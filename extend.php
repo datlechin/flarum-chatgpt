@@ -28,7 +28,10 @@ return [
     (new Extend\Settings())
         ->default('datlechin-chatgpt.model', 'text-davinci-003')
         ->default('datlechin-chatgpt.enable_on_discussion_started', true)
-        ->default('datlechin-chatgpt.max_tokens', 100),
+        ->default('datlechin-chatgpt.max_tokens', 100)
+        ->default('datlechin-chatgpt.user_prompt_badge_text', 'Assistant')
+        ->serializeToForum('chatGptUserPromptId', 'datlechin-chatgpt.user_prompt')
+        ->serializeToForum('chatGptBadgeText', 'datlechin-chatgpt.user_prompt_badge_text'),
     (new Extend\Event())
         ->listen(Started::class, PostChatGPTAnswer::class),
     (new Extend\Policy())

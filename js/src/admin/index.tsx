@@ -39,6 +39,12 @@ app.initializers.add('datlechin/flarum-chatgpt', () => {
       help: app.translator.trans('datlechin-chatgpt.admin.settings.user_prompt_help'),
     })
     .registerSetting({
+      setting: 'datlechin-chatgpt.user_prompt_badge_text',
+      type: 'text',
+      label: app.translator.trans('datlechin-chatgpt.admin.settings.user_prompt_badge_label'),
+      help: app.translator.trans('datlechin-chatgpt.admin.settings.user_prompt_badge_help'),
+    })
+    .registerSetting({
       setting: 'datlechin-chatgpt.enable_on_discussion_started',
       type: 'boolean',
       label: app.translator.trans('datlechin-chatgpt.admin.settings.enable_on_discussion_started_label'),
