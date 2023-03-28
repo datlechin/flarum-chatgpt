@@ -28,11 +28,13 @@ class OpenAI
             return null;
         }
 
+        $maxTokens = (int) $this->settings->get('datlechin-chatgpt.max_tokens', 100);
+
         try {
             $result = $this->client->completions()->create([
                 'model' => $this->settings->get('datlechin-chatgpt.model', 'text-davinci-003'),
                 'prompt' => $content,
-                'max_tokens' => $this->settings->get('datlechin-chatgpt.max_tokens', 100),
+                'max_tokens' => $maxTokens,
             ]);
         } catch (Exception $e) {
             return null;

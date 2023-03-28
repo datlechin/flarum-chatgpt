@@ -67,8 +67,6 @@ class PostChatGPTAnswer
 
         $post->created_at = Carbon::now();
 
-        $this->events->dispatch(new Saving($post, $actor));
-
         $post->save();
     }
 }
