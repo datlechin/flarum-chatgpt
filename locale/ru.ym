@@ -1,0 +1,19 @@
+datlechin-chatgpt:
+  admin:
+    settings:
+      api_key_label: API Key
+      api_key_help: Получите API ключ OpenAI API на <a>openai.com</a>.
+      model_label: Модель
+      model_help: "Узнайте больше о <a>моделе</a> (default: <code>text-davinci-003</code>)."
+      max_tokens_label: Максимальное количество токенов
+      max_tokens_help: <a>Что такое токены и как их считать?</a>
+      user_prompt_label: Использовать промт
+      user_prompt_help: Промт, который будет использоваться для генерации ответа. По умолчанию указывается, кто начал обсуждение.
+      user_prompt_badge_label: Метка запроса пользователя
+      user_prompt_badge_help: Текст, который будет отображаться рядом с запросом пользователя.
+      enable_on_discussion_started_label: Активировать при начале обсуждения
+      enable_on_discussion_started_help: Обсуждение получит ответ на основе содержания первого сообщения при начале обсуждения.
+    permissions:
+      use_chatgpt_assistant_label: Использовать помощника ChatGPT
+
+  forum:
