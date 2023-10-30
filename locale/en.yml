@@ -16,5 +16,5 @@ datlechin-chatgpt:
     permissions:
       use_chatgpt_assistant_label: Use ChatGPT Assistant
     edit_tag:
-      chatgpt_label: Enable chatgpt int this tag
+      chatgpt_label: Use ChatGPT
   forum:
