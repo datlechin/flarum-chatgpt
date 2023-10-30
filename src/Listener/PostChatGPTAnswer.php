@@ -40,6 +40,19 @@ class PostChatGPTAnswer
         }
 
         $discussion = $event->discussion;
+
+
+        /** get discussion's all tag,if one of them is is_chatgpt,go on , or return*/
+        $discussionTags = $discussion->tags;
+        $ischatgpt = false;
+        foreach ($discussionTags as $discussionTag) {
+            if ((bool) $discussionTag->is_chatgpt) {
+                $ischatgpt = true;
+                break;
+            }
+        }
+        if (!$ischatgpt) return;
+
         $actor = $event->actor;
 
         if ($userId = $this->settings->get('datlechin-chatgpt.user_prompt')) {
@@ -52,7 +65,7 @@ class PostChatGPTAnswer
 
         $firstPost = $discussion->firstPost;
 
-        $content = $this->openAI->completions($firstPost->content);
+        $content = $this->openAI->completions($firstPost->title.$firstPost->content);
 
         if (! $content) {
             return;

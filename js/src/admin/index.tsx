@@ -1,4 +1,5 @@
 import app from 'flarum/admin/app';
+import addChatgptToTagsModal from './addChatgptToTagsModal';
 
 app.initializers.add('datlechin/flarum-chatgpt', () => {
   app.extensionData
@@ -69,4 +70,5 @@ app.initializers.add('datlechin/flarum-chatgpt', () => {
       },
       'start'
     );
+    addChatgptToTagsModal();
 });

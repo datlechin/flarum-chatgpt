@@ -15,5 +15,6 @@ datlechin-chatgpt:
       enable_on_discussion_started_help: The discussion will receive an answer based on content of first post when the discussion is started.
     permissions:
       use_chatgpt_assistant_label: Use ChatGPT Assistant
-
+    edit_tag:
+      chatgpt_label: Enable chatgpt int this tag
   forum:
