@@ -1,5 +1,5 @@
 {
-    "name": "datlechin/flarum-chatgpt",
+    "name": "nodeloc/flarum-chatgpt",
     "description": "ChatGPT: AI-powered Auto-Reply Extension for Flarum.",
     "keywords": [
         "flarum",
@@ -15,15 +15,15 @@
     },
     "authors": [
         {
-            "name": "Ngo Quoc Dat",
-            "email": "datlechin@gmail.com",
+            "name": "James",
+            "email": "james@nodeloc.com",
             "role": "Developer",
-            "homepage": "https://ngoquocdat.dev"
+            "homepage": "https://www.nodeloc.com"
         }
     ],
-    "homepage": "https://ngoquocdat.dev",
+    "homepage": "https://www.nodeloc.com",
     "support": {
-        "source": "https://github.com/datlechin/flarum-chatgpt",
+        "source": "https://github.com/nodeloc/flarum-chatgpt",
         "forum": "https://discuss.flarum.org/d/32535"
     },
     "autoload": {
