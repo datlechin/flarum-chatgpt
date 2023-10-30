@@ -8,7 +8,6 @@ This extension is fork from https://github.com/datlechin/flarum-chatgpt . I just
 
 The ChatGPT extension for Flarum includes an auto-reply discussion feature, customizable max tokens, and permission controls who can use this feature.
 
-The auto-answer feature uses the text-davinci-003 model to generate quick and accurate responses to users' questions.
 
 ## Installation
 
@@ -17,13 +16,13 @@ This extension requierd **Flarum 1.7** and **PHP 8.1**.
 Install with composer:
 
 ```sh
-composer require datlechin/flarum-chatgpt:"*"
+composer require nodeloc/flarum-chatgpt:"*"
 ```
 
 ## Updating
 
 ```sh
-composer update datlechin/flarum-chatgpt:"*"
+composer update nodeloc/flarum-chatgpt:"*"
 php flarum migrate
 php flarum cache:clear
 ```
@@ -39,4 +38,5 @@ php flarum cache:clear
 
 - [Packagist](https://packagist.org/packages/nodeloc/flarum-chatgpt)
 - [GitHub](https://github.com/nodeloc/flarum-chatgpt)
-- [Discuss](https://discuss.flarum.org/d/32535)
+- [Discuss](https://discuss.flarum.org/d/33549)
+- [NodeLoc](https://www.nodeloc.com)
