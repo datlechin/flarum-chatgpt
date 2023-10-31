@@ -65,8 +65,8 @@ class PostChatGPTAnswer
 
         $firstPost = $discussion->firstPost;
 
-        $content = $this->openAI->completions($firstPost->title.$firstPost->content);
-
+        $content = $this->openAI->completions("{$firstPost->title} {$firstPost->content}");
+        
         if (! $content) {
             return;
         }
