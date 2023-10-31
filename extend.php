@@ -16,6 +16,11 @@ use Flarum\Discussion\Discussion;
 use Flarum\Extend;
 use Flarum\Discussion\Event\Started;
 use Datlechin\FlarumChatGPT\Listener\PostChatGPTAnswer;
+use Flarum\Tags\Api\Serializer\TagSerializer;
+use Flarum\Tags\Event\Creating as TagCreating;
+use Flarum\Tags\Event\Saving as TagSaving;
+use Flarum\Tags\Tag;
+
 
 return [
     (new Extend\Frontend('forum'))
@@ -24,7 +29,12 @@ return [
     (new Extend\Frontend('admin'))
         ->js(__DIR__ . '/js/dist/admin.js')
         ->css(__DIR__ . '/less/admin.less'),
+
     new Extend\Locales(__DIR__ . '/locale'),
+
+    (new Extend\Model(Tag::class))
+        ->cast('is_chatgpt', 'boolean'),
+
     (new Extend\Settings())
         ->default('datlechin-chatgpt.model', 'text-davinci-003')
         ->default('datlechin-chatgpt.enable_on_discussion_started', true)
@@ -32,8 +42,20 @@ return [
         ->default('datlechin-chatgpt.user_prompt_badge_text', 'Assistant')
         ->serializeToForum('chatGptUserPromptId', 'datlechin-chatgpt.user_prompt')
         ->serializeToForum('chatGptBadgeText', 'datlechin-chatgpt.user_prompt_badge_text'),
+
+    (new Extend\Event())
+        ->listen(TagCreating::class, TagCreating::class)
+        ->listen(TagSaving::class, TagEditing::class),
+
     (new Extend\Event())
         ->listen(Started::class, PostChatGPTAnswer::class),
+
     (new Extend\Policy())
         ->modelPolicy(Discussion::class, DiscussionPolicy::class),
+
+    (new Extend\ApiSerializer(TagSerializer::class))
+        ->attributes(function (TagSerializer $serializer, Tag $tag, array $attributes) {
+            $attributes['isChatgpt'] = (bool) $tag->is_chatgpt;
+            return $attributes;
+        }),
 ];

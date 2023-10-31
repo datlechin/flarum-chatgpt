@@ -6,7 +6,6 @@ A [Flarum](http://flarum.org) extension.
 
 The ChatGPT extension for Flarum includes an auto-reply discussion feature, customizable max tokens, and permission controls who can use this feature.
 
-The auto-answer feature uses the text-davinci-003 model to generate quick and accurate responses to users' questions.
 
 ![](https://user-images.githubusercontent.com/56961917/224526200-4aee65bf-59df-4892-b23d-aab644238101.gif)
 
@@ -17,13 +16,13 @@ This extension requierd **Flarum 1.7** and **PHP 8.1**.
 Install with composer:
 
 ```sh
-composer require datlechin/flarum-chatgpt:"*"
+composer require nodeloc/flarum-chatgpt:"*"
 ```
 
 ## Updating
 
 ```sh
-composer update datlechin/flarum-chatgpt:"*"
+composer update nodeloc/flarum-chatgpt:"*"
 php flarum migrate
 php flarum cache:clear
 ```
