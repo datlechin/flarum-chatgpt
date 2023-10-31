@@ -1,13 +1,13 @@
 # ChatGPT: AI-powered Auto-Reply Extension for Flarum
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/nodeloc/flarum-chatgpt.svg)](https://packagist.org/packages/nodeloc/flarum-chatgpt) [![Total Downloads](https://img.shields.io/packagist/dt/nodeloc/flarum-chatgpt.svg)](https://packagist.org/packages/datlechin/flarum-chatgpt)
+![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/datlechin/flarum-chatgpt.svg)](https://packagist.org/packages/datlechin/flarum-chatgpt) [![Total Downloads](https://img.shields.io/packagist/dt/datlechin/flarum-chatgpt.svg)](https://packagist.org/packages/datlechin/flarum-chatgpt)
 
 A [Flarum](http://flarum.org) extension.
 
-This extension is fork from https://github.com/datlechin/flarum-chatgpt . I just add some features.
-
 The ChatGPT extension for Flarum includes an auto-reply discussion feature, customizable max tokens, and permission controls who can use this feature.
 
+
+![](https://user-images.githubusercontent.com/56961917/224526200-4aee65bf-59df-4892-b23d-aab644238101.gif)
 
 ## Installation
 
@@ -27,16 +27,15 @@ php flarum migrate
 php flarum cache:clear
 ```
 
+Currently only supports the `text-davinci-003` model, having the option to choose from other models in the future is an exciting prospect.
+
 ## Roadmap
 
-- [√] Add enable config in tag
-- [×] Use title and post content as prompt
-- [×] Add config for more keys for polling
-- [×] Add queue work
-- 
+- [ ] Add more models
+- [ ] Select AI user used for auto-reply
+
 ## Links
 
-- [Packagist](https://packagist.org/packages/nodeloc/flarum-chatgpt)
-- [GitHub](https://github.com/nodeloc/flarum-chatgpt)
-- [Discuss](https://discuss.flarum.org/d/33549)
-- [NodeLoc](https://www.nodeloc.com)
+- [Packagist](https://packagist.org/packages/datlechin/flarum-chatgpt)
+- [GitHub](https://github.com/datlechin/flarum-chatgpt)
+- [Discuss](https://discuss.flarum.org/d/32535)
