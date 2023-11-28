@@ -22,7 +22,7 @@ class OpenAI
         $this->client = OpenAIClient::client($this->apiKey);
     }
 
-    public function completions(?string $content = null): ?string
+    public function completions(string $content = null): ?string
     {
         if (! $this->apiKey) {
             return null;

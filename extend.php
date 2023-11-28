@@ -12,19 +12,22 @@
 namespace Datlechin\FlarumChatGPT;
 
 use Datlechin\FlarumChatGPT\Access\DiscussionPolicy;
-use Flarum\Discussion\Discussion;
-use Flarum\Extend;
-use Flarum\Discussion\Event\Started;
 use Datlechin\FlarumChatGPT\Listener\PostChatGPTAnswer;
+use Flarum\Discussion\Discussion;
+use Flarum\Discussion\Event\Started;
+use Flarum\Extend;
 
 return [
     (new Extend\Frontend('forum'))
-        ->js(__DIR__ . '/js/dist/forum.js')
-        ->css(__DIR__ . '/less/forum.less'),
+        ->js(__DIR__.'/js/dist/forum.js')
+        ->css(__DIR__.'/less/forum.less'),
+
     (new Extend\Frontend('admin'))
-        ->js(__DIR__ . '/js/dist/admin.js')
-        ->css(__DIR__ . '/less/admin.less'),
-    new Extend\Locales(__DIR__ . '/locale'),
+        ->js(__DIR__.'/js/dist/admin.js')
+        ->css(__DIR__.'/less/admin.less'),
+
+    new Extend\Locales(__DIR__.'/locale'),
+
     (new Extend\Settings())
         ->default('datlechin-chatgpt.model', 'text-davinci-003')
         ->default('datlechin-chatgpt.enable_on_discussion_started', true)
@@ -32,8 +35,10 @@ return [
         ->default('datlechin-chatgpt.user_prompt_badge_text', 'Assistant')
         ->serializeToForum('chatGptUserPromptId', 'datlechin-chatgpt.user_prompt')
         ->serializeToForum('chatGptBadgeText', 'datlechin-chatgpt.user_prompt_badge_text'),
+
     (new Extend\Event())
         ->listen(Started::class, PostChatGPTAnswer::class),
+
     (new Extend\Policy())
         ->modelPolicy(Discussion::class, DiscussionPolicy::class),
 ];

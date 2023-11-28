@@ -7,11 +7,11 @@ use Datlechin\FlarumChatGPT\OpenAI;
 use Flarum\Discussion\Event\Started;
 use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\Post\CommentPost;
-use Flarum\Post\Event\Saving;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\Exception\PermissionDeniedException;
 use Flarum\User\User;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Arr;
 
 class PostChatGPTAnswer
 {
@@ -41,6 +41,17 @@ class PostChatGPTAnswer
 
         $discussion = $event->discussion;
         $actor = $event->actor;
+        $enabledTagIds = $this->settings->get('datlechin-chatgpt.enabled-tags', []);
+
+        if ($enabledTagIds = json_decode($enabledTagIds, true)) {
+            $discussion = $event->discussion;
+
+            $tagIds = Arr::pluck($discussion->tags, 'id');
+
+            if (! array_intersect($enabledTagIds, $tagIds)) {
+                return;
+            }
+        }
 
         if ($userId = $this->settings->get('datlechin-chatgpt.user_prompt')) {
             $user = User::find($userId);
