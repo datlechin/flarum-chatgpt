@@ -26,6 +26,9 @@ return [
         ->js(__DIR__.'/js/dist/admin.js')
         ->css(__DIR__.'/less/admin.less'),
 
+    (new Extend\Routes('api'))
+        ->get('/datlechin-chatgpt/models', 'datlechin-chatgpt.models', Api\Controller\ShowOpenAiModelsController::class),
+
     new Extend\Locales(__DIR__.'/locale'),
 
     (new Extend\Settings())

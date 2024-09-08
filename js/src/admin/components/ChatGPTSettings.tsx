@@ -1,10 +1,31 @@
 import app from 'flarum/admin/app';
 import ExtensionPage from 'flarum/admin/components/ExtensionPage';
+import Stream from 'flarum/common/utils/Stream';
 
 export default class ChatGPTSettings extends ExtensionPage {
-  oninit(vnode) {
+  loading: boolean = true;
+  models: Stream<Record<string, string>>;
+
+  oninit(vnode: any) {
     super.oninit(vnode);
-    this.loading = false;
+    this.models = Stream<Record<string, string>>({});
+
+    app
+      .request({
+        url: `${app.forum.attribute('apiUrl')}/datlechin-chatgpt/models`,
+        method: 'GET',
+      })
+      .then((response: any) => {
+        const models: Record<string, string> = {};
+        response.forEach((model: { id: string }) => {
+          models[model.id] = model.id;
+        });
+        this.models(models);
+      })
+      .finally(() => {
+        this.loading = false;
+        m.redraw();
+      });
   }
 
   content() {
@@ -24,19 +45,7 @@ export default class ChatGPTSettings extends ExtensionPage {
             {this.buildSettingComponent({
               setting: 'datlechin-chatgpt.model',
               type: 'dropdown',
-              options: {
-                'text-davinci-003': 'text-davinci-003',
-                'gpt-3.5-turbo': 'gpt-3.5-turbo',
-                'gpt-3.5-turbo-16k': 'gpt-3.5-turbo-16k',
-                'text-davinci-002': 'text-davinci-002',
-                'code-davinci-002': 'code-davinci-002',
-                'gpt-4': 'gpt-4',
-                'gpt-4-0613': 'gpt-4-0613',
-                'gpt-4-32k': 'gpt-4-32k',
-                'gpt-4-32k-0613': 'gpt-4-32k-0613',
-                'gpt-4-0314': 'gpt-4-0314',
-                'gpt-4-32k-0314': 'gpt-4-32k-0314',
-              },
+              options: this.models(),
               label: app.translator.trans('datlechin-chatgpt.admin.settings.model_label'),
               help: app.translator.trans('datlechin-chatgpt.admin.settings.model_help', {
                 a: <a href="https://platform.openai.com/docs/models/overview" target="_blank" rel="noopener" />,

@@ -3,36 +3,23 @@
 namespace Datlechin\FlarumChatGPT\Listener;
 
 use Carbon\Carbon;
-use Datlechin\FlarumChatGPT\OpenAI;
+use Datlechin\FlarumChatGPT\OpenAIClient;
 use Flarum\Discussion\Event\Started;
-use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\Post\CommentPost;
 use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\User\Exception\PermissionDeniedException;
 use Flarum\User\User;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 
 class PostChatGPTAnswer
 {
-    use DispatchEventsTrait;
-
-    protected $events;
-
-    protected SettingsRepositoryInterface $settings;
-
-    protected OpenAI $openAI;
-
-    public function __construct(Dispatcher $events, SettingsRepositoryInterface $settings, OpenAI $openAI)
-    {
-        $this->events = $events;
-        $this->settings = $settings;
-        $this->openAI = $openAI;
+    public function __construct(
+        protected Dispatcher $events,
+        protected SettingsRepositoryInterface $settings,
+        protected OpenAIClient $client
+    ) {
     }
 
-    /**
-     * @throws PermissionDeniedException
-     */
     public function handle(Started $event): void
     {
         if (! $this->settings->get('datlechin-chatgpt.enable_on_discussion_started', true)) {
@@ -41,7 +28,7 @@ class PostChatGPTAnswer
 
         $discussion = $event->discussion;
         $actor = $event->actor;
-        $enabledTagIds = $this->settings->get('datlechin-chatgpt.enabled-tags', []);
+        $enabledTagIds = $this->settings->get('datlechin-chatgpt.enabled-tags', '[]');
 
         if ($enabledTagIds = json_decode($enabledTagIds, true)) {
             $discussion = $event->discussion;
@@ -57,13 +44,9 @@ class PostChatGPTAnswer
             $user = User::find($userId);
         }
 
-        $userPromptId = $user->id ?? $actor->id;
-
         $actor->assertCan('useChatGPTAssistant', $discussion);
 
-        $firstPost = $discussion->firstPost;
-
-        $content = $this->openAI->completions($firstPost->content);
+        $content = $this->client->completions($discussion->firstPost->content);
 
         if (! $content) {
             return;
@@ -72,7 +55,7 @@ class PostChatGPTAnswer
         $post = CommentPost::reply(
             $discussion->id,
             $content,
-            $userPromptId,
+            $user->id ?? $actor->id,
             null,
         );
 
