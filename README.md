@@ -1,5 +1,5 @@
 # ChatGPT: AI-powered Auto-Reply Extension for Flarum
-
+增加自定义第三方api的支持
 ![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/datlechin/flarum-chatgpt.svg)](https://packagist.org/packages/datlechin/flarum-chatgpt) [![Total Downloads](https://img.shields.io/packagist/dt/datlechin/flarum-chatgpt.svg)](https://packagist.org/packages/datlechin/flarum-chatgpt)
 
 A [Flarum](http://flarum.org) extension.
