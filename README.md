@@ -1,6 +1,4 @@
 # ChatGPT: AI-powered Auto-Reply Extension for Flarum
-增加自定义第三方api的支持, 安装原版后,用本仓库的文件进行覆盖操作
-插件目录vender\datlechin\flarum-chatgpt
 ![](https://private-user-images.githubusercontent.com/90635150/425006174-aa99612f-2f1c-4532-85f5-9b26a0ac729f.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDI0NzgzNjgsIm5iZiI6MTc0MjQ3ODA2OCwicGF0aCI6Ii85MDYzNTE1MC80MjUwMDYxNzQtYWE5OTYxMmYtMmYxYy00NTMyLTg1ZjUtOWIyNmEwYWM3MjlmLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMjAlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzIwVDEzNDEwOFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTQ3MDNkYjFmZDA0MmFjYmRjODhlYjBkNzc2NTMzYTBiM2FlNDRjMWJkZjA5NDFhY2U0NTliNDg1MjM1ZGFlYjAmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.LzrMPvGptg8rP_S6tHLGwKuGysIwyhNx2Ur70JFya9k)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/datlechin/flarum-chatgpt.svg)](https://packagist.org/packages/datlechin/flarum-chatgpt) [![Total Downloads](https://img.shields.io/packagist/dt/datlechin/flarum-chatgpt.svg)](https://packagist.org/packages/datlechin/flarum-chatgpt)
 
