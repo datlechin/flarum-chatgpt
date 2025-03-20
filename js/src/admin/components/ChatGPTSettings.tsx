@@ -3,30 +3,8 @@ import ExtensionPage from 'flarum/admin/components/ExtensionPage';
 import Stream from 'flarum/common/utils/Stream';
 
 export default class ChatGPTSettings extends ExtensionPage {
-  loading: boolean = true;
-  models: Stream<Record<string, string>>;
+  
 
-  oninit(vnode: any) {
-    super.oninit(vnode);
-    this.models = Stream<Record<string, string>>({});
-
-    app
-      .request({
-        url: `${app.forum.attribute('apiUrl')}/datlechin-chatgpt/models`,
-        method: 'GET',
-      })
-      .then((response: any) => {
-        const models: Record<string, string> = {};
-        response.forEach((model: { id: string }) => {
-          models[model.id] = model.id;
-        });
-        this.models(models);
-      })
-      .finally(() => {
-        this.loading = false;
-        m.redraw();
-      });
-  }
 
   content() {
     return (
@@ -42,23 +20,34 @@ export default class ChatGPTSettings extends ExtensionPage {
               }),
               placeholder: 'sk-...',
             })}
+
+            
             {this.buildSettingComponent({
-              setting: 'datlechin-chatgpt.model',
-              type: 'dropdown',
-              options: this.models(),
-              label: app.translator.trans('datlechin-chatgpt.admin.settings.model_label'),
-              help: app.translator.trans('datlechin-chatgpt.admin.settings.model_help', {
-                a: <a href="https://platform.openai.com/docs/models/overview" target="_blank" rel="noopener" />,
-              }),
+              type: 'text',
+              setting: 'datlechin-chatgpt.api_base',
+              label: app.translator.trans('datlechin-chatgpt.admin.settings.api_base_label'),
+              placeholder: 'https://api.openai.com/v1',
+              help: app.translator.trans('datlechin-chatgpt.admin.settings.api_base_help')
             })}
+
+            
             {this.buildSettingComponent({
-              setting: 'datlechin-chatgpt.max_tokens',
-              type: 'number',
-              label: app.translator.trans('datlechin-chatgpt.admin.settings.max_tokens_label'),
-              help: app.translator.trans('datlechin-chatgpt.admin.settings.max_tokens_help', {
-                a: <a href="https://help.openai.com/en/articles/4936856" target="_blank" rel="noopener" />,
-              }),
-              default: 100,
+                setting: 'datlechin-chatgpt.model',
+                type: 'text',
+                label: app.translator.trans('datlechin-chatgpt.admin.settings.model_label'),
+                help: app.translator.trans('datlechin-chatgpt.admin.settings.model_help', {
+                    a: <a href="YOUR_API_DOCS_URL" target="_blank" rel="noopener" />,
+                }),
+                placeholder: 'gpt-3.5-turbo',
+            })}
+            
+            {this.buildSettingComponent({
+                type: 'number',
+                setting: 'datlechin-chatgpt.max_tokens',
+                label: app.translator.trans('datlechin-chatgpt.admin.settings.max_tokens_label'),
+                help: app.translator.trans('datlechin-chatgpt.admin.settings.max_tokens_help'),
+                min: 1,
+                max: 2048
             })}
             {this.buildSettingComponent({
               setting: 'datlechin-chatgpt.user_prompt',
@@ -92,6 +81,7 @@ export default class ChatGPTSettings extends ExtensionPage {
                 },
               },
             })}
+           
             <div className="Form-group">{this.submitButton()}</div>
           </div>
         </div>
