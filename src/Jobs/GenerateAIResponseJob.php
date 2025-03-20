@@ -75,7 +75,17 @@ class GenerateAIResponseJob implements ShouldQueue
             $post->created_at = Carbon::now();
             if (!$post->save()) {
                 $logger->error('回复保存失败', ['discussion' => $this->discussionId]);
+                return;
             }
+
+            // 更新discussion的最后回复信息
+            $discussion = $post->discussion;
+            $discussion->last_posted_at = $post->created_at;
+            $discussion->last_posted_user_id = $post->user_id;
+            $discussion->last_post_id = $post->id;
+            $discussion->last_post_number = $post->number;
+            $discussion->save();
+
         } catch (\Throwable $e) {
             $logger->error('AI回复生成失败', [
                 'error' => $e->getMessage(),
