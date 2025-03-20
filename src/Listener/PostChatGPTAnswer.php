@@ -10,13 +10,16 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+// 修改构造函数注入日志接口
+use Psr\Log\LoggerInterface;
 
 class PostChatGPTAnswer
 {
     public function __construct(
         protected Dispatcher $events,
         protected SettingsRepositoryInterface $settings,
-        protected OpenAIClient $client
+        protected OpenAIClient $client,
+        protected LoggerInterface $logger
     ) {
     }
 
@@ -52,15 +55,31 @@ class PostChatGPTAnswer
             return;
         }
 
-        $post = CommentPost::reply(
-            $discussion->id,
-            $content,
-            $user->id ?? $actor->id,
-            null,
-        );
+        // 确保关联关系已加载（新增部分）
+        $discussion->loadMissing(['firstPost', 'tags']);
 
-        $post->created_at = Carbon::now();
+        // 删除所有队列相关代码
+        // 增加直接同步调用
+        try {
+            // 修改后的同步调用
+            $job = new \Datlechin\FlarumChatGPT\Jobs\GenerateAIResponseJob(
+                $discussion->id,
+                $actor->id,
+                $user->id ?? null
+            );
+            
+            $job->handle(
+                resolve(OpenAIClient::class),
+                resolve(LoggerInterface::class)
+            );
 
-        $post->save();
+            $this->logger->info('AI回复已同步生成');
+
+        } catch (\Throwable $e) {
+            $this->logger->error('AI回复生成失败', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 }

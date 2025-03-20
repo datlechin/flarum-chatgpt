@@ -11,39 +11,56 @@ use Psr\Log\LoggerInterface;
 
 class OpenAIClient
 {
-    public ?Client $client = null;
-
     public function __construct(protected SettingsRepositoryInterface $settings, protected LoggerInterface $logger)
     {
         $apiKey = $this->settings->get('datlechin-chatgpt.api_key');
+        $apiBase = $this->settings->get('datlechin-chatgpt.api_base');
 
-        if (empty($apiKey)) {
-            $this->logger->error('OpenAI API key is not set.');
-            return;
-        }
-
-        $this->client = OpenAI::client($apiKey);
+        // 使用通用的HTTP客户端替代OpenAI SDK
+        $this->client = new \GuzzleHttp\Client([
+            'base_uri' => $apiBase,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ]
+        ]);
     }
 
-    public function completions(string $content = null): ?string
+    public function completions(string $prompt)
     {
         try {
-            $result = $this->client->completions()->create([
-                'model' => $this->settings->get('datlechin-chatgpt.model', 'text-davinci-003'),
-                'prompt' => $content,
-                'max_tokens' => (int) $this->settings->get('datlechin-chatgpt.max_tokens', 100),
+            $response = $this->client->post('/v1/chat/completions', [
+                'json' => [
+                    'model' => $this->settings->get('datlechin-chatgpt.model', 'gpt-3.5-turbo'),
+                    'messages' => [
+                        [
+                            'role' => 'system',
+                            'content' => '你是一个有帮助的论坛助手'
+                        ],
+                        [
+                            'role' => 'user', 
+                            'content' => $prompt
+                        ]
+                    ],
+                    'temperature' => 0.7,
+                    'max_tokens' => (int) $this->settings->get('datlechin-chatgpt.max_tokens', 100),
+                ]
             ]);
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage());
 
+            $response = json_decode($response->getBody(), true);
+            
+            if (!isset($response['choices'][0]['message']['content'])) {
+                throw new \Exception('无效的API响应格式: ' . json_encode($response));
+            }
+            
+            return trim($response['choices'][0]['message']['content']);
+
+        } catch (\Throwable $e) {
+            $this->logger->error('API请求失败: ' . $e->getMessage(), [
+                'prompt' => $prompt,
+                'error' => $e->getMessage()
+            ]);
             return null;
         }
-
-        return $result->choices[0]->text;
-    }
-
-    public function models(): Models
-    {
-        return $this->client->models();
     }
 }

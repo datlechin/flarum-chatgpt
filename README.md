@@ -28,6 +28,13 @@ php flarum migrate
 php flarum cache:clear
 ```
 
+Currently only supports the `text-davinci-003` model, having the option to choose from other models in the future is an exciting prospect.
+
+## Roadmap
+
+- [ ] Add more models
+- [ ] Select AI user used for auto-reply
+
 ## Links
 
 - [Packagist](https://packagist.org/packages/datlechin/flarum-chatgpt)

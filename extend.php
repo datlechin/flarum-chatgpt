@@ -36,9 +36,10 @@ return [
         ->default('datlechin-chatgpt.enable_on_discussion_started', true)
         ->default('datlechin-chatgpt.max_tokens', 100)
         ->default('datlechin-chatgpt.user_prompt_badge_text', 'Assistant')
+        ->default('datlechin-chatgpt.api_base', '')
         ->serializeToForum('chatGptUserPromptId', 'datlechin-chatgpt.user_prompt')
-        ->serializeToForum('chatGptBadgeText', 'datlechin-chatgpt.user_prompt_badge_text'),
-
+        ->serializeToForum('chatGptBadgeText', 'datlechin-chatgpt.user_prompt_badge_text')
+        ->serializeToForum('chatGptApiBase', 'datlechin-chatgpt.api_base'),// 新增API基础地址配置项
     (new Extend\Event())
         ->listen(Started::class, PostChatGPTAnswer::class),
 
