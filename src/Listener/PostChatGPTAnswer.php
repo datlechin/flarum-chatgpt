@@ -10,13 +10,15 @@ use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
+use Psr\Log\LoggerInterface;
 
 class PostChatGPTAnswer
 {
     public function __construct(
         protected Dispatcher $events,
         protected SettingsRepositoryInterface $settings,
-        protected OpenAIClient $client
+        protected OpenAIClient $client,
+        protected LoggerInterface $logger
     ) {
     }
 
@@ -52,15 +54,26 @@ class PostChatGPTAnswer
             return;
         }
 
-        $post = CommentPost::reply(
-            $discussion->id,
-            $content,
-            $user->id ?? $actor->id,
-            null,
-        );
+        $discussion->loadMissing(['firstPost', 'tags']);
+        try {
+            $job = new \Datlechin\FlarumChatGPT\Jobs\GenerateAIResponseJob(
+                $discussion->id,
+                $actor->id,
+                $user->id ?? null
+            );
+            
+            $job->handle(
+                resolve(OpenAIClient::class),
+                resolve(LoggerInterface::class)
+            );
 
-        $post->created_at = Carbon::now();
+            $this->logger->info('AI reply has been generated synchronously');
 
-        $post->save();
+        } catch (\Throwable $e) {
+            $this->logger->error('AI reply generation failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 }

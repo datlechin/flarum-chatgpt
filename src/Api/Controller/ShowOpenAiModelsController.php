@@ -19,15 +19,12 @@ class ShowOpenAiModelsController implements RequestHandlerInterface
     ) {
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
+     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $data = $this->cache->get('datlechin-chatgpt.models') ?: [];
-
-        if (empty($data) && $this->settings->get('datlechin-chatgpt.api_key')) {
-            $data = $this->client->models()->list()->data;
-            $this->cache->put('datlechin-chatgpt.models', $data, 60 * 60);
-        }
-
-        return new JsonResponse($data);
+        $models = explode(',', $this->settings->get('datlechin-chatgpt.available_models', 'gpt-3.5-turbo,gpt-4'));
+        
+        return new JsonResponse([
+            'data' => array_map('trim', $models)
+        ]);
     }
 }
