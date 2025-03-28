@@ -4,6 +4,7 @@
 
 A [Flarum](http://flarum.org) extension.
 兼容第三方openai的api，@机器人会触发回复
+
 The ChatGPT extension for Flarum includes an auto-reply discussion feature, customizable max tokens, and permission controls who can use this feature.
 
 The auto-answer feature uses the text-davinci-003 model to generate quick and accurate responses to users' questions.
