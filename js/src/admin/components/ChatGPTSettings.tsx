@@ -47,7 +47,7 @@ export default class ChatGPTSettings extends ExtensionPage {
                 label: app.translator.trans('datlechin-chatgpt.admin.settings.max_tokens_label'),
                 help: app.translator.trans('datlechin-chatgpt.admin.settings.max_tokens_help'),
                 min: 1,
-                max: 2048
+                max: 4096
             })}
             {this.buildSettingComponent({
               setting: 'datlechin-chatgpt.user_prompt',

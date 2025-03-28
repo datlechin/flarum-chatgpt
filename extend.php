@@ -16,6 +16,7 @@ use Datlechin\FlarumChatGPT\Listener\PostChatGPTAnswer;
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Started;
 use Flarum\Extend;
+use Flarum\Post\Event\Posted;
 
 return [
     (new Extend\Frontend('forum'))
@@ -40,8 +41,11 @@ return [
         ->serializeToForum('chatGptUserPromptId', 'datlechin-chatgpt.user_prompt')
         ->serializeToForum('chatGptBadgeText', 'datlechin-chatgpt.user_prompt_badge_text')
         ->serializeToForum('chatGptApiBase', 'datlechin-chatgpt.api_base'),
+
     (new Extend\Event())
-        ->listen(Started::class, PostChatGPTAnswer::class),
+        ->listen(Started::class, [PostChatGPTAnswer::class, 'handle'])
+        ->listen(Posted::class, [PostChatGPTAnswer::class, 'handleMention'])
+        ->subscribe(PostChatGPTAnswer::class),
 
     (new Extend\Policy())
         ->modelPolicy(Discussion::class, DiscussionPolicy::class),

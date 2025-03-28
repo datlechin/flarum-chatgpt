@@ -18,10 +18,13 @@ class GenerateAIResponseJob implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    protected string $prompt;
+
     public function __construct(
         protected int $discussionId,
-        protected int $actorId,
-        protected ?int $userId = null
+        protected int $actorId, 
+        protected ?int $userId = null,
+        protected ?string $prompt = null  
     ) {
     }
 
@@ -36,7 +39,9 @@ class GenerateAIResponseJob implements ShouldQueue
             $actor = User::findOrFail($this->actorId);
             $user = $this->userId ? User::find($this->userId) : null;
 
-            $prompt = "{$discussion->title}\n{$discussion->firstPost->content}";
+            if (!$this->prompt) {
+                $this->prompt = "{$discussion->title}\n{$discussion->firstPost->content}";
+            }
 
             $logger->debug('Calling the OpenAI API', [
                 'title' => $discussion->title,
@@ -44,7 +49,7 @@ class GenerateAIResponseJob implements ShouldQueue
                 'model' => app(SettingsRepositoryInterface::class)->get('datlechin-chatgpt.model')
             ]);
 
-            $content = $client->completions($prompt);
+            $content = $client->completions($this->prompt);
 
             if (empty($content)) {
                 $logger->warning('OpenAI API returns empty content', [
