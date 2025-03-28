@@ -4,6 +4,12 @@
 
 A [Flarum](http://flarum.org) extension.
 兼容第三方openai的api，@机器人会触发回复
+因为未合并到原作者仓库
+需要先安装原有的应用
+```composer require datlechin/flarum-chatgpt:"*"```
+后台启用之后
+然后下载仓库的文件
+直接上传到vendor/datlechin/flarum-chatgpt文件夹，要清理缓存
 
 The ChatGPT extension for Flarum includes an auto-reply discussion feature, customizable max tokens, and permission controls who can use this feature.
 
