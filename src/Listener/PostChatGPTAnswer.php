@@ -32,50 +32,115 @@ class PostChatGPTAnswer
         $events->listen(Posted::class, [$this, 'handleMention']);
     }
 
-    public function handle(Started $event): void
+    public function handle(Started $event): void 
     {
-        if (! $this->settings->get('datlechin-chatgpt.enable_on_discussion_started', true)) {
-            return;
-        }
-
-        $discussion = $event->discussion;
-        $actor = $event->actor;
-        $enabledTagIds = $this->settings->get('datlechin-chatgpt.enabled-tags', '[]');
-
-        if ($enabledTagIds = json_decode($enabledTagIds, true)) {
-            $discussion = $event->discussion;
-            $tagIds = Arr::pluck($discussion->tags, 'id');
-            
-            if (! array_intersect($enabledTagIds, $tagIds)) {
+        try {
+            // 检查是否启用自动回复
+            if (! $this->settings->get('datlechin-chatgpt.enable_on_discussion_started', true)) {
                 return;
             }
-        }
 
-        if ($userId = $this->settings->get('datlechin-chatgpt.user_prompt')) {
-            $user = User::find($userId);
-        }
+            $discussion = $event->discussion;
+            $actor = $event->actor;
 
-        $actor->assertCan('useChatGPTAssistant', $discussion);
+            // 检查标签权限
+            $enabledTagIds = $this->settings->get('datlechin-chatgpt.enabled-tags', '[]');
+            if ($enabledTagIds = json_decode($enabledTagIds, true)) {
+                $discussion->loadMissing(['tags']);
+                $tagIds = Arr::pluck($discussion->tags, 'id');
+                
+                if (! array_intersect($enabledTagIds, $tagIds)) {
+                    $this->logger->debug('Discussion tags not enabled for auto-reply', [
+                        'discussion_id' => $discussion->id,
+                        'tags' => $tagIds
+                    ]);
+                    return;
+                }
+            }
 
-        $discussion->loadMissing(['firstPost', 'tags']);
-        
-        try {
-            $job = new \Datlechin\FlarumChatGPT\Jobs\GenerateAIResponseJob(
-                $discussion->id,
-                $actor->id,
-                $user->id ?? null,
-                "{$discussion->title}\n{$discussion->firstPost->content}"
-            );
+            // 获取机器人用户
+            if (!($userId = $this->settings->get('datlechin-chatgpt.user_prompt')) || 
+                !($botUser = User::find($userId))) {
+                $this->logger->warning('Bot user not configured or not found');
+                return;
+            }
+
+            $actor->assertCan('useChatGPTAssistant', $discussion);
+
+            $discussion->loadMissing(['firstPost', 'tags']);
             
-            $job->handle(
-                $this->client,
-                $this->logger
-            );
+            // 构建更丰富的提示
+            $context = "话题标题: {$discussion->title}\n\n";
+            $context .= "话题内容: " . Utils::removeFormatting($discussion->firstPost->parsed_content) . "\n\n";
+            
+            $prompt = <<<EOT
+请根据以下话题内容生成一个详细的回复。
 
+背景信息:
+{$context}
+
+要求:
+1. 请提供详细的分析和见解
+2. 回答要全面且深入
+3. 至少包含3-4个重点内容
+4. 回应要有实用价值
+5. 保持专业且友好的语气
+6. 回复长度至少200字
+7. 使用背景信息相同的语言回答
+8. 如果是提问,请直接给出答案
+9. 如果是讨论,请给出建设性意见
+10. 适当使用分段提高可读性
+
+请生成回复:
+
+EOT;
+
+            try {
+                
+                $response = $this->processResponse($prompt, [
+                    'discussion_id' => $discussion->id,
+                    'actor_id' => $actor->id
+                ]);
+
+                if (empty($response) || mb_strlen($response) < 200) {
+                    $this->logger->warning('AI response too short', [
+                        'discussion_id' => $discussion->id,
+                        'length' => mb_strlen($response ?? '')
+                    ]);
+                    return;
+                }
+                
+                $cacheKey = "chatgpt_replied_discussion_{$discussion->id}";
+                if (app('cache')->has($cacheKey)) {
+                    $this->logger->debug('Already replied to this discussion');
+                    return;
+                }
+               
+                $replyPost = $this->createReplyPost(
+                    $response,
+                    $discussion,
+                    $actor,
+                    $botUser
+                );
+
+                app('cache')->put($cacheKey, true, Carbon::now()->addMinutes(5));
+
+                $this->logger->info('Auto-reply posted successfully', [
+                    'post_id' => $replyPost->id,
+                    'discussion_id' => $discussion->id,
+                    'response_length' => mb_strlen($response)
+                ]);
+
+            } catch (\Throwable $e) {
+                $this->logError('Auto-reply generation failed', $e, [
+                    'discussion_id' => $discussion->id,
+                    'actor_id' => $actor->id
+                ]);
+            }
         } catch (\Throwable $e) {
-            $this->logger->error('AI reply generation failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString() 
+            $this->logError('Handle event failed', $e, [
+                'discussion_id' => $discussion->id ?? null,
+                'actor_id' => $actor->id ?? null
             ]);
         }
     }
@@ -136,10 +201,9 @@ class PostChatGPTAnswer
         $recentPosts = $discussion->posts()
             ->whereVisibleTo($currentPost->user)
             ->where('id', '<', $currentPost->id)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('number', 'asc')  
             ->limit(5)
-            ->get()
-            ->reverse();
+            ->get();
 
         if ($recentPosts->isNotEmpty()) {
             $context .= "最近的对话记录:\n";
@@ -174,7 +238,7 @@ class PostChatGPTAnswer
 3. 如果上下文信息不足，可以自由发挥
 4. 回复中不要包含已知信息
 5. 保持回答的专业性、准确性
-6. 使用简体中文回答
+6. 使用相同的语言回答
 
 EOT;
         }
@@ -226,6 +290,9 @@ EOT;
 
     private function createReplyPost(string $content, $discussion, $actor, $botUser): CommentPost
     {
+        $lastPost = $discussion->posts()->orderBy('number', 'desc')->first();
+        $nextNumber = $lastPost ? $lastPost->number + 1 : 1;
+        
         $post = CommentPost::reply(
             $discussion->id,
             $content,
@@ -233,11 +300,16 @@ EOT;
             $actor
         );
         
+        $post->number = $nextNumber;
+        $post->created_at = Carbon::now();
+        
+        $post->unsetEventDispatcher();
         $post->save();
         
         $this->logger->debug('Reply post created', [
             'post_id' => $post->id,
             'discussion_id' => $discussion->id,
+            'post_number' => $post->number,
             'bot_id' => $botUser->id,
             'content_length' => mb_strlen($content)
         ]);
@@ -306,18 +378,16 @@ EOT;
 
             app('cache')->put($cacheKey, true, Carbon::now()->addMinutes(5));
 
-            $replyPost = CommentPost::reply(
-                $discussion->id,
+            $replyPost = $this->createReplyPost(
                 $response,
-                $botUser->id,
-                $event->actor
+                $discussion,
+                $event->actor,
+                $botUser
             );
-
-            $replyPost->unsetEventDispatcher();
-            $replyPost->save();
 
             $this->logger->info('Response posted successfully', [
                 'post_id' => $replyPost->id,
+                'post_number' => $replyPost->number,
                 'discussion_id' => $discussion->id,
                 'response_length' => mb_strlen($response),
                 'bot_id' => $botUser->id
