@@ -258,7 +258,7 @@ Requirements:
 3. Use your knowledge if context is insufficient
 4. Avoid including known information
 5. Maintain professionalism and accuracy
-6. Answer in English
+6. Answer in the same language.
 
 EOT;
     }
@@ -303,15 +303,25 @@ EOT;
         $post->number = $nextNumber;
         $post->created_at = Carbon::now();
         
+        // 禁用事件分发器
         $post->unsetEventDispatcher();
         $post->save();
         
-        $this->logger->debug('Reply post created', [
+        // 更新讨论的最后回复信息
+        $discussion->refreshCommentCount();
+        $discussion->last_posted_at = $post->created_at;
+        $discussion->last_posted_user_id = $botUser->id;
+        $discussion->last_post_id = $post->id;
+        $discussion->last_post_number = $post->number;
+        $discussion->save();
+        
+        $this->logger->debug('Reply post created and discussion updated', [
             'post_id' => $post->id,
             'discussion_id' => $discussion->id,
             'post_number' => $post->number,
             'bot_id' => $botUser->id,
-            'content_length' => mb_strlen($content)
+            'content_length' => mb_strlen($content),
+            'comment_count' => $discussion->comment_count
         ]);
         
         return $post;
