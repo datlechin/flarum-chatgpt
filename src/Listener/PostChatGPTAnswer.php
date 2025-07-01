@@ -3,9 +3,10 @@
 namespace Datlechin\FlarumChatGPT\Listener;
 
 use Carbon\Carbon;
-use Datlechin\FlarumChatGPT\OpenAIClient;
+use Flarum\OpenAI\OpenAIClient;
 use Flarum\Discussion\Event\Started;
 use Flarum\Post\CommentPost;
+use Flarum\Post\PostRepository;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -14,8 +15,9 @@ use Illuminate\Support\Arr;
 class PostChatGPTAnswer
 {
     public function __construct(
-        protected Dispatcher $events,
+        protected PostRepository $posts,
         protected SettingsRepositoryInterface $settings,
+        protected Dispatcher $events,
         protected OpenAIClient $client
     ) {
     }
@@ -28,11 +30,10 @@ class PostChatGPTAnswer
 
         $discussion = $event->discussion;
         $actor = $event->actor;
+        
         $enabledTagIds = $this->settings->get('datlechin-chatgpt.enabled-tags', '[]');
 
         if ($enabledTagIds = json_decode($enabledTagIds, true)) {
-            $discussion = $event->discussion;
-
             $tagIds = Arr::pluck($discussion->tags, 'id');
 
             if (! array_intersect($enabledTagIds, $tagIds)) {
@@ -46,7 +47,13 @@ class PostChatGPTAnswer
 
         $actor->assertCan('useChatGPTAssistant', $discussion);
 
-        $content = $this->client->completions($discussion->firstPost->content);
+        $response = $this->client->completions($discussion->firstPost->content);
+        
+        if (empty($response) || !isset($response['choices'][0]['message']['content'])) {
+            return;
+        }
+
+        $content = $response['choices'][0]['message']['content'];
 
         if (! $content) {
             return;

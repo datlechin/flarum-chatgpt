@@ -1,48 +1,43 @@
 <?php
 
-namespace Datlechin\FlarumChatGPT;
+namespace Flarum\OpenAI;
 
-use Exception;
-use Flarum\Settings\SettingsRepositoryInterface;
 use OpenAI;
-use OpenAI\Client;
-use OpenAI\Resources\Models;
-use Psr\Log\LoggerInterface;
+use Flarum\Settings\SettingsRepositoryInterface;
 
 class OpenAIClient
 {
-    public ?Client $client = null;
+    private $client;
+    private $settings;
 
-    public function __construct(protected SettingsRepositoryInterface $settings, protected LoggerInterface $logger)
+    public function __construct(string $apiKey, SettingsRepositoryInterface $settings)
     {
-        $apiKey = $this->settings->get('datlechin-chatgpt.api_key');
-
-        if (empty($apiKey)) {
-            $this->logger->error('OpenAI API key is not set.');
-            return;
-        }
-
         $this->client = OpenAI::client($apiKey);
+        $this->settings = $settings;
     }
 
-    public function completions(string $content = null): ?string
+    public function completions(string $prompt, int $maxTokens = null, float $temperature = null): array
     {
-        try {
-            $result = $this->client->completions()->create([
-                'model' => $this->settings->get('datlechin-chatgpt.model', 'text-davinci-003'),
-                'prompt' => $content,
-                'max_tokens' => (int) $this->settings->get('datlechin-chatgpt.max_tokens', 100),
-            ]);
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage());
+        $model = $this->settings->get('datlechin-chatgpt.model', 'gpt-3.5-turbo');
+        $maxTokens = $maxTokens ?? (int) $this->settings->get('datlechin-chatgpt.max_tokens', 150);
+        $temperature = $temperature ?? (float) $this->settings->get('datlechin-chatgpt.temperature', 0.7);
 
-            return null;
-        }
+        $response = $this->client->chat()->completions()->create([
+            'model' => $model,
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => $prompt,
+                ],
+            ],
+            'max_tokens' => $maxTokens,
+            'temperature' => $temperature,
+        ]);
 
-        return $result->choices[0]->text;
+        return $response->toArray();
     }
 
-    public function models(): Models
+    public function models()
     {
         return $this->client->models();
     }
