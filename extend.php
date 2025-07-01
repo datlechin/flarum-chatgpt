@@ -42,7 +42,7 @@ return [
                     throw new \Exception('OpenAI API key is not set.');
                 }
                 
-                return new OpenAIClient($apiKey);
+                return new OpenAIClient($apiKey, $settings);
             });
         }),
 
@@ -50,6 +50,7 @@ return [
         ->default('datlechin-chatgpt.model', 'gpt-3.5-turbo')
         ->default('datlechin-chatgpt.enable_on_discussion_started', true)
         ->default('datlechin-chatgpt.max_tokens', 100)
+        ->default('datlechin-chatgpt.temperature', 0.7)
         ->default('datlechin-chatgpt.user_prompt_badge_text', 'Assistant')
         ->serializeToForum('chatGptUserPromptId', 'datlechin-chatgpt.user_prompt')
         ->serializeToForum('chatGptBadgeText', 'datlechin-chatgpt.user_prompt_badge_text'),
