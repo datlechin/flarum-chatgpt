@@ -13,6 +13,7 @@ namespace Datlechin\FlarumChatGPT;
 
 use Datlechin\FlarumChatGPT\Access\DiscussionPolicy;
 use Datlechin\FlarumChatGPT\Listener\PostChatGPTAnswer;
+use Flarum\OpenAI\OpenAIClient;
 use Flarum\Discussion\Discussion;
 use Flarum\Discussion\Event\Started;
 use Flarum\Extend;
@@ -31,8 +32,22 @@ return [
 
     new Extend\Locales(__DIR__.'/locale'),
 
+    (new Extend\ServiceProvider())
+        ->register(function ($container) {
+            $container->singleton(OpenAIClient::class, function ($container) {
+                $settings = $container->make('Flarum\Settings\SettingsRepositoryInterface');
+                $apiKey = $settings->get('datlechin-chatgpt.api_key');
+                
+                if (empty($apiKey)) {
+                    throw new \Exception('OpenAI API key is not set.');
+                }
+                
+                return new OpenAIClient($apiKey);
+            });
+        }),
+
     (new Extend\Settings())
-        ->default('datlechin-chatgpt.model', 'text-davinci-003')
+        ->default('datlechin-chatgpt.model', 'gpt-3.5-turbo')
         ->default('datlechin-chatgpt.enable_on_discussion_started', true)
         ->default('datlechin-chatgpt.max_tokens', 100)
         ->default('datlechin-chatgpt.user_prompt_badge_text', 'Assistant')

@@ -2,7 +2,7 @@
 
 namespace Datlechin\FlarumChatGPT\Api\Controller;
 
-use Datlechin\FlarumChatGPT\OpenAIClient;
+use Flarum\OpenAI\OpenAIClient;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Contracts\Cache\Store;
 use Laminas\Diactoros\Response\JsonResponse;

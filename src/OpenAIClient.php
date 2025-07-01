@@ -1,48 +1,36 @@
 <?php
 
-namespace Datlechin\FlarumChatGPT;
+namespace Flarum\OpenAI;
 
-use Exception;
-use Flarum\Settings\SettingsRepositoryInterface;
 use OpenAI;
-use OpenAI\Client;
-use OpenAI\Resources\Models;
-use Psr\Log\LoggerInterface;
 
 class OpenAIClient
 {
-    public ?Client $client = null;
+    private $client;
 
-    public function __construct(protected SettingsRepositoryInterface $settings, protected LoggerInterface $logger)
+    public function __construct(string $apiKey)
     {
-        $apiKey = $this->settings->get('datlechin-chatgpt.api_key');
-
-        if (empty($apiKey)) {
-            $this->logger->error('OpenAI API key is not set.');
-            return;
-        }
-
         $this->client = OpenAI::client($apiKey);
     }
 
-    public function completions(string $content = null): ?string
+    public function completions(string $prompt, int $maxTokens = 150, float $temperature = 0.7): array
     {
-        try {
-            $result = $this->client->completions()->create([
-                'model' => $this->settings->get('datlechin-chatgpt.model', 'text-davinci-003'),
-                'prompt' => $content,
-                'max_tokens' => (int) $this->settings->get('datlechin-chatgpt.max_tokens', 100),
-            ]);
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage());
+        $response = $this->client->chat()->completions()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => $prompt,
+                ],
+            ],
+            'max_tokens' => $maxTokens,
+            'temperature' => $temperature,
+        ]);
 
-            return null;
-        }
-
-        return $result->choices[0]->text;
+        return $response->toArray();
     }
 
-    public function models(): Models
+    public function models()
     {
         return $this->client->models();
     }
