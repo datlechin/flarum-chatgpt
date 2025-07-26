@@ -1,6 +1,7 @@
 /vendor
 composer.lock
 composer.phar
+auth.json
 
 .DS_Store
 Thumbs.db
