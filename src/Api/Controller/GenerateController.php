@@ -16,12 +16,10 @@ class GenerateController implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $actor = RequestUtil::getActor($request);
-        // Requiere el permiso que registramos en extend.php
         $actor->assertPermission('kubano09-chatgpt-writer.use');
 
         $body   = (array) $request->getParsedBody();
         $prompt = trim((string)($body['prompt'] ?? ''));
-
         if ($prompt === '') {
             return new JsonResponse(['error' => 'Prompt vacío'], 422);
         }
@@ -31,9 +29,7 @@ class GenerateController implements RequestHandlerInterface
                 ['role' => 'system', 'content' => 'Eres un asistente que redacta textos claros y concisos para un foro.'],
                 ['role' => 'user',   'content' => $prompt],
             ];
-            $res = $this->client->chat($messages);
-
-            // Extrae el texto del primer choice
+            $res  = $this->client->chat($messages);
             $text = $res['choices'][0]['message']['content'] ?? '';
             return new JsonResponse(['text' => (string) $text]);
         } catch (\Throwable $e) {

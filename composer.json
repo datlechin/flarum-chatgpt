@@ -1,68 +1,33 @@
 {
-    "name": "datlechin/flarum-chatgpt",
-    "description": "ChatGPT: AI-powered Auto-Reply Extension for Flarum.",
-    "keywords": [
-        "flarum",
-        "chatgpt",
-        "openai"
-    ],
-    "type": "flarum-extension",
-    "license": "MIT",
-    "require": {
-        "php": "^8.1",
-        "flarum/core": "^1.8.5",
-        "openai-php/client": "^0.14.0"
-    },
-    "authors": [
-        {
-            "name": "Ngo Quoc Dat",
-            "email": "datlechin@gmail.com",
-            "role": "Developer",
-            "homepage": "https://ngoquocdat.dev"
-        }
-    ],
-    "homepage": "https://ngoquocdat.dev",
-    "support": {
-        "source": "https://github.com/datlechin/flarum-chatgpt",
-        "forum": "https://discuss.flarum.org/d/32535"
-    },
-    "autoload": {
-        "psr-4": {
-            "Datlechin\\FlarumChatGPT\\": "src/"
-        }
-    },
-    "extra": {
-        "flarum-extension": {
-            "title": "ChatGPT",
-            "category": "feature",
-            "icon": {
-                "image": "icon.svg"
-            }
-        },
-        "flarum-cli": {
-            "modules": {
-                "admin": true,
-                "forum": true,
-                "js": true,
-                "jsCommon": false,
-                "css": true,
-                "locale": true,
-                "gitConf": true,
-                "githubActions": false,
-                "prettier": true,
-                "typescript": true,
-                "bundlewatch": false,
-                "backendTesting": false,
-                "editorConfig": true,
-                "styleci": false
-            }
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "config": {
-        "allow-plugins": {
-            "php-http/discovery": true
-        }
+  "name": "kubano09/flarum-chatgpt-writer",
+  "description": "ChatGPT writer for Flarum (revived & updated)",
+  "type": "flarum-extension",
+  "license": "MIT",
+  "require": {
+    "flarum/core": "^1.8",
+    "guzzlehttp/guzzle": "^7.8",
+    "openai-php/client": "^0.10"
+  },
+  "autoload": {
+    "psr-4": {
+      "Kubano09\\ChatgptWriter\\": "src/"
     }
+  },
+  "extra": {
+    "flarum-extension": {
+      "title": "ChatGPT Writer",
+      "category": "feature"
+    }
+  },
+  "support": {
+    "issues": "https://github.com/kubano09/flarum-chatgpt-writer/issues",
+    "source": "https://github.com/kubano09/flarum-chatgpt-writer"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  }
 }
